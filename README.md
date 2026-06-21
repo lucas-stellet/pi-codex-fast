@@ -18,6 +18,16 @@ Disable fast mode:
 
 When enabled, the extension adds `service_tier: "priority"` to provider requests only when the active model provider is `openai-codex`.
 
+The setting is persisted globally in `~/.pi/agent/settings.json`:
+
+```json
+{
+  "codexFast": {
+    "enabled": true
+  }
+}
+```
+
 ## Install
 
 Install as a pi package from GitHub:
