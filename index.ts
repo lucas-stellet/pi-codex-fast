@@ -1,6 +1,6 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-type CodexFastMode = "fast" | "off";
+type CodexFastMode = "on" | "off";
 
 const SERVICE_TIER = "priority";
 
@@ -14,24 +14,24 @@ export default function codexFast(pi: ExtensionAPI) {
 	};
 
 	pi.registerCommand("codex-fast", {
-		description: "Toggle OpenAI Codex fast mode: /codex-fast fast|off",
+		description: "Toggle OpenAI Codex fast mode: /codex-fast on|off",
 		handler: async (args, ctx) => {
 			const value = args.trim().toLowerCase();
 
 			if (!value) {
-				ctx.ui.notify(`Codex fast mode is ${mode}. Use /codex-fast fast or /codex-fast off.`, "info");
+				ctx.ui.notify(`Codex fast mode is ${mode}. Use /codex-fast on or /codex-fast off.`, "info");
 				ctx.ui.setStatus("codex-fast", statusText());
 				return;
 			}
 
-			if (value !== "fast" && value !== "off") {
-				ctx.ui.notify("Usage: /codex-fast fast|off", "error");
+			if (value !== "on" && value !== "off") {
+				ctx.ui.notify("Usage: /codex-fast on|off", "error");
 				return;
 			}
 
 			setMode(value);
 			ctx.ui.setStatus("codex-fast", statusText());
-			ctx.ui.notify(`Codex fast mode ${value === "fast" ? "enabled" : "disabled"}.`, "info");
+			ctx.ui.notify(`Codex fast mode ${value === "on" ? "enabled" : "disabled"}.`, "info");
 		},
 	});
 
@@ -44,7 +44,7 @@ export default function codexFast(pi: ExtensionAPI) {
 	});
 
 	pi.on("before_provider_request", (event, ctx) => {
-		if (mode !== "fast") return;
+		if (mode !== "on") return;
 		if (ctx.model?.provider !== "openai-codex") return;
 		if (!event.payload || typeof event.payload !== "object") return;
 

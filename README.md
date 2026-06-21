@@ -7,7 +7,7 @@ Minimal [pi](https://github.com/earendil-works/pi) extension to toggle fast mode
 Enable fast mode:
 
 ```text
-/codex-fast fast
+/codex-fast on
 ```
 
 Disable fast mode:
