@@ -50,7 +50,8 @@ function persistMode(mode: CodexFastMode) {
 export default function codexFast(pi: ExtensionAPI) {
 	let mode: CodexFastMode = readPersistedMode();
 
-	const statusText = () => `codex-fast: ${mode}`;
+	const statusText = (provider: string | undefined) =>
+		provider === "openai-codex" ? `codex-fast: ${mode}` : undefined;
 
 	const setMode = (nextMode: CodexFastMode) => {
 		mode = nextMode;
@@ -60,11 +61,17 @@ export default function codexFast(pi: ExtensionAPI) {
 	pi.registerCommand("codex-fast", {
 		description: "Toggle OpenAI Codex fast mode: /codex-fast on|off",
 		handler: async (args, ctx) => {
+			if (ctx.model?.provider !== "openai-codex") {
+				ctx.ui.setStatus("codex-fast", undefined);
+				ctx.ui.notify("Codex fast mode is only available with the openai-codex provider.", "warning");
+				return;
+			}
+
 			const value = args.trim().toLowerCase();
 
 			if (!value) {
 				ctx.ui.notify(`Codex fast mode is ${mode}. Use /codex-fast on or /codex-fast off.`, "info");
-				ctx.ui.setStatus("codex-fast", statusText());
+				ctx.ui.setStatus("codex-fast", statusText(ctx.model?.provider));
 				return;
 			}
 
@@ -81,18 +88,18 @@ export default function codexFast(pi: ExtensionAPI) {
 				return;
 			}
 
-			ctx.ui.setStatus("codex-fast", statusText());
+			ctx.ui.setStatus("codex-fast", statusText(ctx.model?.provider));
 			ctx.ui.notify(`Codex fast mode ${value === "on" ? "enabled" : "disabled"}.`, "info");
 		},
 	});
 
 	pi.on("session_start", (_event, ctx) => {
 		mode = readPersistedMode();
-		ctx.ui.setStatus("codex-fast", statusText());
+		ctx.ui.setStatus("codex-fast", statusText(ctx.model?.provider));
 	});
 
 	pi.on("model_select", (_event, ctx) => {
-		ctx.ui.setStatus("codex-fast", statusText());
+		ctx.ui.setStatus("codex-fast", statusText(ctx.model?.provider));
 	});
 
 	pi.on("before_provider_request", (event, ctx) => {

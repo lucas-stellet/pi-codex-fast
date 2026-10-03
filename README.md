@@ -4,6 +4,8 @@ Minimal [pi](https://github.com/earendil-works/pi) extension to toggle fast mode
 
 ## Usage
 
+The command and status indicator are only available when the active model provider is `openai-codex`. With another provider (or no selected model), the command reports that it is unavailable and does not change the saved setting. The command may still appear in pi's command list.
+
 Enable fast mode:
 
 ```text
@@ -16,7 +18,7 @@ Disable fast mode:
 /codex-fast off
 ```
 
-When enabled, the extension adds `service_tier: "priority"` to provider requests only when the active model provider is `openai-codex`.
+When enabled, the extension adds `service_tier: "priority"` to provider requests only when the active model provider is `openai-codex`. Switching providers hides the status indicator without clearing the saved preference; switching back to Codex restores it.
 
 The setting is persisted globally in `~/.pi/agent/settings.json`:
 
