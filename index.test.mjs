@@ -37,24 +37,30 @@ function setup(provider, enabled = false) {
 	return { ctx, handlers, notifications, statuses, command: commands.get("codex-fast").handler };
 }
 
-test("Codex can enable and disable fast mode while preserving other settings", async () => {
-	const app = setup("openai-codex");
+test("OpenAI can enable and disable fast mode while preserving other settings", async () => {
+	const app = setup("openai");
 	await app.command(" ON ", app.ctx);
 	assert.equal(app.statuses.get("codex-fast"), "codex-fast: on");
 	assert.deepEqual(JSON.parse(readFileSync(settingsPath, "utf8")), { theme: "test", codexFast: { enabled: true } });
 	await app.command("off", app.ctx);
 	assert.equal(app.statuses.get("codex-fast"), "codex-fast: off");
 	assert.equal(JSON.parse(readFileSync(settingsPath, "utf8")).codexFast.enabled, false);
+	assert.equal(app.handlers.get("before_provider_request")({ payload: {} }, app.ctx), undefined);
 });
 
-for (const provider of ["openai", "anthropic", undefined]) {
+for (const provider of ["openai-codex", "anthropic", undefined]) {
 	test(`fast mode cannot be enabled for ${provider ?? "a missing model"}`, async () => {
 		const app = setup(provider);
 		await app.command("on", app.ctx);
 		assert.equal(JSON.parse(readFileSync(settingsPath, "utf8")).codexFast.enabled, false);
 		assert.equal(app.statuses.get("codex-fast"), undefined);
-		assert.match(app.notifications.at(-1).text, /only available.*openai-codex/);
+		assert.match(app.notifications.at(-1).text, /only available with the openai provider\./);
 		assert.equal(app.handlers.get("before_provider_request")({ payload: {} }, app.ctx), undefined);
+
+		const enabledApp = setup(provider, true);
+		await enabledApp.command("off", enabledApp.ctx);
+		assert.equal(JSON.parse(readFileSync(settingsPath, "utf8")).codexFast.enabled, true);
+		assert.equal(enabledApp.handlers.get("before_provider_request")({ payload: {} }, enabledApp.ctx), undefined);
 	});
 }
 
@@ -62,13 +68,13 @@ test("status follows provider changes without losing the persisted preference", 
 	const app = setup("anthropic", true);
 	app.handlers.get("session_start")({}, app.ctx);
 	assert.equal(app.statuses.get("codex-fast"), undefined);
-	app.ctx.model = { provider: "openai-codex" };
+	app.ctx.model = { provider: "openai" };
 	app.handlers.get("model_select")({}, app.ctx);
 	assert.equal(app.statuses.get("codex-fast"), "codex-fast: on");
 	const payload = { model: "test", input: [] };
 	assert.deepEqual(app.handlers.get("before_provider_request")({ payload }, app.ctx), { ...payload, service_tier: "priority" });
 	assert.equal(payload.service_tier, undefined);
-	app.ctx.model = { provider: "openai" };
+	app.ctx.model = { provider: "openai-codex" };
 	app.handlers.get("model_select")({}, app.ctx);
 	assert.equal(app.statuses.get("codex-fast"), undefined);
 	assert.equal(app.handlers.get("before_provider_request")({ payload }, app.ctx), undefined);

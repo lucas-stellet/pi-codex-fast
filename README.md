@@ -1,10 +1,10 @@
 # pi-codex-fast
 
-Minimal [pi](https://github.com/earendil-works/pi) extension to toggle fast mode for the `openai-codex` provider.
+Minimal [pi](https://github.com/earendil-works/pi) extension to toggle fast mode for the `openai` provider.
 
 ## Usage
 
-The command and status indicator are only available when the active model provider is `openai-codex`. With another provider (or no selected model), the command reports that it is unavailable and does not change the saved setting. The command may still appear in pi's command list.
+The command and status indicator are only available when the active model provider is `openai`. With another provider (or no selected model), the command reports that it is unavailable and does not change the saved setting. The command may still appear in pi's command list.
 
 Enable fast mode:
 
@@ -18,7 +18,9 @@ Disable fast mode:
 /codex-fast off
 ```
 
-When enabled, the extension adds `service_tier: "priority"` to provider requests only when the active model provider is `openai-codex`. Switching providers hides the status indicator without clearing the saved preference; switching back to Codex restores it.
+When enabled, the extension adds `service_tier: "priority"` to provider requests only when the active model provider is `openai`. Switching providers hides the status indicator without clearing the saved preference; switching back to OpenAI restores it.
+
+The `/codex-fast` command and `codexFast` setting names are kept for compatibility. The `openai-codex` provider is not supported.
 
 The setting is persisted globally in `~/.pi/agent/settings.json`:
 

@@ -51,7 +51,7 @@ export default function codexFast(pi: ExtensionAPI) {
 	let mode: CodexFastMode = readPersistedMode();
 
 	const statusText = (provider: string | undefined) =>
-		provider === "openai-codex" ? `codex-fast: ${mode}` : undefined;
+		provider === "openai" ? `codex-fast: ${mode}` : undefined;
 
 	const setMode = (nextMode: CodexFastMode) => {
 		mode = nextMode;
@@ -59,18 +59,18 @@ export default function codexFast(pi: ExtensionAPI) {
 	};
 
 	pi.registerCommand("codex-fast", {
-		description: "Toggle OpenAI Codex fast mode: /codex-fast on|off",
+		description: "Toggle OpenAI fast mode: /codex-fast on|off",
 		handler: async (args, ctx) => {
-			if (ctx.model?.provider !== "openai-codex") {
+			if (ctx.model?.provider !== "openai") {
 				ctx.ui.setStatus("codex-fast", undefined);
-				ctx.ui.notify("Codex fast mode is only available with the openai-codex provider.", "warning");
+				ctx.ui.notify("OpenAI fast mode is only available with the openai provider.", "warning");
 				return;
 			}
 
 			const value = args.trim().toLowerCase();
 
 			if (!value) {
-				ctx.ui.notify(`Codex fast mode is ${mode}. Use /codex-fast on or /codex-fast off.`, "info");
+				ctx.ui.notify(`OpenAI fast mode is ${mode}. Use /codex-fast on or /codex-fast off.`, "info");
 				ctx.ui.setStatus("codex-fast", statusText(ctx.model?.provider));
 				return;
 			}
@@ -89,7 +89,7 @@ export default function codexFast(pi: ExtensionAPI) {
 			}
 
 			ctx.ui.setStatus("codex-fast", statusText(ctx.model?.provider));
-			ctx.ui.notify(`Codex fast mode ${value === "on" ? "enabled" : "disabled"}.`, "info");
+			ctx.ui.notify(`OpenAI fast mode ${value === "on" ? "enabled" : "disabled"}.`, "info");
 		},
 	});
 
@@ -104,7 +104,7 @@ export default function codexFast(pi: ExtensionAPI) {
 
 	pi.on("before_provider_request", (event, ctx) => {
 		if (mode !== "on") return;
-		if (ctx.model?.provider !== "openai-codex") return;
+		if (ctx.model?.provider !== "openai") return;
 		if (!event.payload || typeof event.payload !== "object") return;
 
 		return {

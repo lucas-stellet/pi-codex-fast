@@ -1,7 +1,7 @@
 {
   "name": "pi-codex-fast",
   "version": "0.1.0",
-  "description": "Minimal pi extension to toggle OpenAI Codex fast mode.",
+  "description": "Minimal pi extension to toggle fast mode for the OpenAI provider.",
   "type": "module",
   "pi": {
     "extensions": ["./index.ts"]
